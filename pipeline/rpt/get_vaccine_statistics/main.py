@@ -110,6 +110,7 @@ def generate_vax_report(_):
     df["total_vac"] = df["male_vac"] + df["female_vac"] + df["trans_vac"]
 
     today = df["date"].sort_values().values[-1] # Cheeky way to get the last date in the DF
+    today = pd.to_datetime(today)
     yesterday = today - timedelta(days=1)
 
     todayDF = df.loc[df["date"] == today]
