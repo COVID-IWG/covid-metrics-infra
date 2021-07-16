@@ -108,8 +108,7 @@ def tweet_vax_report(request):
 def pretty_print_dataframe(df):
     """ Given a series, pretty print the contents into a single string for the tweet"""
 
-    return df.to_csv()[df.to_csv().find("\n") + 1:]
-
+    return "".join([i for i in x.to_csv()[x.to_csv().find("\n")+1:] if i != '\"']).replace(",", " ")
 def tweet_vax_ranking(_):
     bucket.blob("pipeline/rpt/districts_sorted_absolute.csv").download_to_filename("/tmp/districts_sorted_absolute.csv")
     bucket.blob("pipeline/rpt/percentage_first_dose_state_wise.csv").download_to_filename("/tmp/percentage_first_dose_state_wise.csv")
