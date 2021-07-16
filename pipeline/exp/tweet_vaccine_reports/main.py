@@ -129,6 +129,7 @@ def tweet_vax_ranking(_):
     twitter = get_twitter_client(env="staging")
     twitter.update_status(
             status="{} Top 10 districts-1st+2nd dose\n{}".format(str(today.date()), pretty_print_dataframe(districtWise[:10]))
+            )
 
     return "OK!"
 
