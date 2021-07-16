@@ -139,3 +139,5 @@ def generate_vax_report(_):
     transfer_csv_to_bucket("/tmp/today.txt")
     transfer_csv_to_bucket("/tmp/percentage_first_dose_state_wise.csv")
     transfer_csv_to_bucket("/tmp/percentage_second_dose_state_wise.csv")
+
+    return "OK!"
