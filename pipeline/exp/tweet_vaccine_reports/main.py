@@ -1,5 +1,7 @@
 import tweepy
 from google.cloud import secretmanager, storage
+import pandas as pd
+import numpy as np
 
 # cloud details
 project_id = "adaptive-control"
@@ -102,3 +104,28 @@ def tweet_vax_report(request):
             media_ids=media_ids
             )
     return "OK!"
+
+def pretty_print_dataframe(df):
+    """ Given a series, pretty print the contents into a single string for the tweet"""
+    return df.to_string()[df.to_string().find("\n") + 1:]
+
+
+def tweet_vax_ranking(_):
+    bucket.blob("pipeline/rpt/districts_sorted_absolute.csv").download_to_filename("/tmp/districts_sorted_absolute.csv")
+    bucket.blob("pipeline/rpt/percentage_first_dose_state_wise.csv").download_to_filename("/tmp/percentage_first_dose_state_wise.csv")
+    bucket.blob("pipeline/rpt/percentage_second_dose_state_wise.csv").download_to_filename("/tmp/percentage_second_dose_state_wise.csv")
+    bucket.blob("pipeline/rpt/today.txt").download_to_filename("/tmp/today.txt")
+
+    with open("/tmp/today.txt") as f:
+        for line in f:
+            today = np.datetime64(line.rstrip("\n"))
+    today = pd.to_datetime(today)
+    print("Top 10 districts by absolute numbers")
+    districtWise = pd.read_csv("districts_sorted_absolute.csv")
+
+    twitter = get_twitter_client(env="staging")
+    twitter.update_status(
+            status="{} Top 10 districts-1st+2nd dose\n{}".format(str(today.date()), pretty_print_dataframe(districtWise[:10]))
+
+    return "OK!"
+

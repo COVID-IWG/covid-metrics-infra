@@ -2,6 +2,7 @@ import pandas as pd
 from google.cloud import storage
 import matplotlib.pyplot as plt
 import os
+from datetime impot date, timedelta
 
 bucket_name = "daily_pipeline"
 bucket = storage.Client().bucket(bucket_name)
@@ -48,12 +49,21 @@ state_lookup = {
  'Uttarakhand': 'UT',
  'West Bengal': 'WB'}
 
-def transfer_to_bucket(file_path):
+def transfer_image_to_bucket(file_path):
     size_kb = os.stat(file_path).st_size / 1000
     print("Timeseries artifact size : {} KB".format(size_kb))
     assert size_kb > 15
     file_name = file_path.split("/")[2]
     bucket.blob("pipeline/rpt/{}".format(file_name)).upload_from_filename(file_path, content_type="image/png")
+
+
+def transfer_csv_to_bucket(file_path):
+    file_name = file_path.split("/")[2]
+    bucket.blob("pipeling/rpt/{}".format(file_name)).upload_from_filename(file_path)
+
+def obtain_from_bucket(file_name):
+    bucket.blob("pipeline/data/{}".format(file_name)).download_to_filename("/tmp/{}".format(file_name))
+    return "/tmp/{}".format(file_name)
 
 def generate_vax_report(_):
 
@@ -63,6 +73,7 @@ def generate_vax_report(_):
 
     # convert date to proper format
     df["date"] = pd.to_datetime(df["date"])
+    df["district_state"] = df["district"] + ", " + df["state"].apply(lambda x : state_lookup[x])
 
     statesList = df["state"].unique()
     for state in statesList:
@@ -90,18 +101,40 @@ def generate_vax_report(_):
         print("Generated second dose statistics plot for {}".format(state))
 
         # Check if the outputs are at least 50 kb and transfer them to buckets
-        transfer_to_bucket("/tmp/first_dose_admin_{}.png".format(state_code))
-        transfer_to_bucket("/tmp/total_individuals_registered_{}.png".format(state_code))
-        transfer_to_bucket("/tmp/second_dose_admin_{}.png".format(state_code))
+        transfer_image_to_bucket("/tmp/first_dose_admin_{}.png".format(state_code))
+        transfer_image_to_bucket("/tmp/total_individuals_registered_{}.png".format(state_code))
+        transfer_image_to_bucket("/tmp/second_dose_admin_{}.png".format(state_code))
 
     # top 10 districts nationwide based on number of vaccines administered in a given day
 
     df["total_vac"] = df["male_vac"] + df["female_vac"] + df["trans_vac"]
-    todayDF = df.loc[df["date"] == "2021-05-10", ["district", "state","total_vac"]].copy().reset_index()
-    yesterdayDF = df.loc[df["date"] == "2021-05-09", ["district","state", "total_vac"]].copy().reset_index()
 
-    differenceDF = todayDF.copy()
-    differenceDF["total_vac"] -= yesterdayDF["total_vac"]
-    top10Districts = differenceDF.sort_values(by = "total_vac", ascending = False)[:10]
-    print(top10Districts)
-    return "OK!"
+    today = df["date"].sort_values().values[-1] # Cheeky way to get the last date in the DF
+    yesterday = today - timedelta(days=1)
+
+    todayDF = df.loc[df["date"] == today]
+    yesterdayDF = df.loc[df["date"] == yesterday]
+    differenceDF = todayDF.groupby("district_state").sum()["first_dose_admin"] + todayDF.groupby("district_state").sum()["second_dose_admin"] - yesterdayDF.groupby("district_state").sum()["first_dose_admin"] - yesterdayDF.groupby("district_state").sum()["second_dose_admin"]
+
+    differenceDF.sort_values(ascending=False).to_csv("/tmp/districts_sorted_absolute.csv", index=False)
+    transfer_csv_to_bucket("/tmp/districts_sorted_absolute.csv")
+
+    # population stuff
+
+    vaccine_eligible_pop = pd.load_csv(obtain_from_bucket(" vaccine_eligible_pop_state_wise.csv"))
+
+    stateWiseVax = todayDF.groupby("lgd_state_name").sum()
+    indiaVax = pd.DataFrame(stateWiseVax.sum(axis=0)).T
+    indiaVax.index = ["india"]
+    stateWiseVax = pd.concat([stateWiseVax, indiaVax])
+    stateWisePop = vaccine_eligible_pop.set_index("State")
+    percentageFirstDose = (stateWiseVax["first_dose_admin"])/stateWisePop["20+ total"] * 100.0
+    percentageSecondDose = (stateWiseVax["second_dose_admin"]/stateWisePop["20+ total"]) * 100.0
+
+    percentageFirstDose.sort_values(ascending=False).to_csv("/tmp/percentage_first_dose_state_wise.csv", index=False)
+    percentageSecondDose.sort_values(ascenting=False).to_csv("/tmp/percentage_second_dose_state_wise.csv", index=False)
+    with open("/tmp/today.txt", "w") as f:
+        f.write(today)
+    transfer_csv_to_bucket("/tmp/today.txt")
+    transfer_csv_to_bucket("/tmp/percentage_first_dose_state_wise.csv")
+    transfer_csv_to_bucket("/tmp/precentage_second_dose_state_wise.csv")
