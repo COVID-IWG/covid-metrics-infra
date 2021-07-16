@@ -2,7 +2,7 @@ import pandas as pd
 from google.cloud import storage
 import matplotlib.pyplot as plt
 import os
-from datetime impot date, timedelta
+from datetime import date, timedelta
 
 bucket_name = "daily_pipeline"
 bucket = storage.Client().bucket(bucket_name)
