@@ -59,7 +59,7 @@ def transfer_image_to_bucket(file_path):
 
 def transfer_csv_to_bucket(file_path):
     file_name = file_path.split("/")[2]
-    bucket.blob("pipeling/rpt/{}".format(file_name)).upload_from_filename(file_path)
+    bucket.blob("pipeline/rpt/{}".format(file_name)).upload_from_filename(file_path)
 
 def obtain_from_bucket(file_name):
     bucket.blob("pipeline/data/{}".format(file_name)).download_to_filename("/tmp/{}".format(file_name))
