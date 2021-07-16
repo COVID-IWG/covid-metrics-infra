@@ -107,7 +107,10 @@ def tweet_vax_report(request):
 
 def pretty_print_dataframe(df):
     """ Given a series, pretty print the contents into a single string for the tweet"""
-    return df.to_string()[df.to_string().find("\n") + 1:]
+
+    firstPass = df.to_string()[df.to_string().find("\n") + 1:]
+    secondPass = firstPass[firstPass.find("\n") + 1:]
+    return secondPass
 
 
 def tweet_vax_ranking(_):
@@ -121,7 +124,7 @@ def tweet_vax_ranking(_):
             today = np.datetime64(line.rstrip("\n"))
     today = pd.to_datetime(today)
     print("Top 10 districts by absolute numbers")
-    districtWise = pd.read_csv("districts_sorted_absolute.csv")
+    districtWise = pd.read_csv("/tmp/districts_sorted_absolute.csv", index_col="district_state")
 
     twitter = get_twitter_client(env="staging")
     twitter.update_status(

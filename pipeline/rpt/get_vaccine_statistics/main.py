@@ -117,12 +117,12 @@ def generate_vax_report(_):
     yesterdayDF = df.loc[df["date"] == yesterday]
     differenceDF = todayDF.groupby("district_state").sum()["first_dose_admin"] + todayDF.groupby("district_state").sum()["second_dose_admin"] - yesterdayDF.groupby("district_state").sum()["first_dose_admin"] - yesterdayDF.groupby("district_state").sum()["second_dose_admin"]
 
-    differenceDF.sort_values(ascending=False).to_csv("/tmp/districts_sorted_absolute.csv", index=False)
+    differenceDF.sort_values(ascending=False).to_csv("/tmp/districts_sorted_absolute.csv")
     transfer_csv_to_bucket("/tmp/districts_sorted_absolute.csv")
 
     # population stuff
 
-    vaccine_eligible_pop = pd.load_csv(obtain_from_bucket(" vaccine_eligible_pop_state_wise.csv"))
+    vaccine_eligible_pop = pd.read_csv(obtain_from_bucket(" vaccine_eligible_pop_state_wise.csv"))
 
     stateWiseVax = todayDF.groupby("lgd_state_name").sum()
     indiaVax = pd.DataFrame(stateWiseVax.sum(axis=0)).T
@@ -132,8 +132,8 @@ def generate_vax_report(_):
     percentageFirstDose = (stateWiseVax["first_dose_admin"])/stateWisePop["20+ total"] * 100.0
     percentageSecondDose = (stateWiseVax["second_dose_admin"]/stateWisePop["20+ total"]) * 100.0
 
-    percentageFirstDose.sort_values(ascending=False).to_csv("/tmp/percentage_first_dose_state_wise.csv", index=False)
-    percentageSecondDose.sort_values(ascenting=False).to_csv("/tmp/percentage_second_dose_state_wise.csv", index=False)
+    percentageFirstDose.sort_values(ascending=False).to_csv("/tmp/percentage_first_dose_state_wise.csv")
+    percentageSecondDose.sort_values(ascenting=False).to_csv("/tmp/percentage_second_dose_state_wise.csv")
     with open("/tmp/today.txt", "w") as f:
         f.write(today)
     transfer_csv_to_bucket("/tmp/today.txt")
