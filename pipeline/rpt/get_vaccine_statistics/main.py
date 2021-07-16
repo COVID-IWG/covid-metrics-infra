@@ -122,7 +122,7 @@ def generate_vax_report(_):
 
     # population stuff
 
-    vaccine_eligible_pop = pd.read_csv(obtain_from_bucket(" vaccine_eligible_pop_state_wise.csv"))
+    vaccine_eligible_pop = pd.read_csv(obtain_from_bucket("vaccine_eligible_pop_state_wise.csv"))
 
     stateWiseVax = todayDF.groupby("lgd_state_name").sum()
     indiaVax = pd.DataFrame(stateWiseVax.sum(axis=0)).T
