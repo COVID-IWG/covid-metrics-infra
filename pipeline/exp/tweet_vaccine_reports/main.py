@@ -122,9 +122,9 @@ def tweet_vax_ranking(_):
     today = pd.to_datetime(today)
     print("Top 10 districts by absolute numbers")
     districtWise = pd.read_csv("/tmp/districts_sorted_absolute.csv", index_col="district_state")
-    firstDosePercentage = pd.read_csv("/tmp/percentage_first_dose_state_wise.csv", names=["state", "percentage"]).set_index("state")
-    secondDosePercentage = pd.read_csv("/tmp/percentage_second_dose_state_wise.csv", names=["state", "percentage"]).set_index("state")
-    overallPercentage = pd.read_csv("/tmp/percentage_overall_state_wise.csv", names=["state", "percentage"]).set_index("state")
+    firstDosePercentage = pd.read_csv("/tmp/percentage_first_dose_state_wise.csv", names=["state", "percentage"]).set_index("state").dropna()
+    secondDosePercentage = pd.read_csv("/tmp/percentage_second_dose_state_wise.csv", names=["state", "percentage"]).set_index("state").dropna()
+    overallPercentage = pd.read_csv("/tmp/percentage_overall_state_wise.csv", names=["state", "percentage"]).set_index("state").dropna()
 
     twitter = get_twitter_client(env="staging")
     twitter.update_status(
