@@ -135,7 +135,7 @@ def generate_vax_report(_):
 
     percentageFirstDose.sort_values(ascending=False).to_csv("/tmp/percentage_first_dose_state_wise.csv")
     percentageSecondDose.sort_values(ascending=False).to_csv("/tmp/percentage_second_dose_state_wise.csv")
-    percentageOverall.sort_values(ascending=False).to_csv("/tmp/percentage_overall.csv")
+    percentageOverall.sort_values(ascending=False).to_csv("/tmp/percentage_overall_state_wise.csv")
 
     with open("/tmp/today.txt", "w") as f:
         f.write(str(today))
