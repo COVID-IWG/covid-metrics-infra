@@ -145,10 +145,6 @@ def tweet_vax_ranking(_):
     twitter.update_status(
             status="{} Top 5 states-% of both doses vaxxed 18+ pop\n{}".format(str(today.date()), pretty_print_dataframe(overallPercentage[:5]))
             )
-    twitter.update_status(
-            status="{} Bottom 5 states-% of both doses vaxxed 18+ pop\n{}".format(str(today.date()), pretty_print_dataframe(overallPercentage[-5:]))
-            )
-
 
     return "OK!"
 
