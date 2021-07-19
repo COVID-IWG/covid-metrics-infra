@@ -113,7 +113,7 @@ def tweet_vax_ranking(_):
     bucket.blob("pipeline/rpt/districts_sorted_absolute.csv").download_to_filename("/tmp/districts_sorted_absolute.csv")
     bucket.blob("pipeline/rpt/percentage_first_dose_state_wise.csv").download_to_filename("/tmp/percentage_first_dose_state_wise.csv")
     bucket.blob("pipeline/rpt/percentage_second_dose_state_wise.csv").download_to_filename("/tmp/percentage_second_dose_state_wise.csv")
-    bucket.blob("pipeline/rpt/percentage_overall_state_wise.csv").download_to_filename("/tmp/percentage_state_wise.csv")
+    bucket.blob("pipeline/rpt/percentage_overall_state_wise.csv").download_to_filename("/tmp/percentage_overall_state_wise.csv")
     bucket.blob("pipeline/rpt/today.txt").download_to_filename("/tmp/today.txt")
 
     with open("/tmp/today.txt") as f:
