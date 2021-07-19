@@ -113,6 +113,7 @@ def tweet_vax_ranking(_):
     bucket.blob("pipeline/rpt/districts_sorted_absolute.csv").download_to_filename("/tmp/districts_sorted_absolute.csv")
     bucket.blob("pipeline/rpt/percentage_first_dose_state_wise.csv").download_to_filename("/tmp/percentage_first_dose_state_wise.csv")
     bucket.blob("pipeline/rpt/percentage_second_dose_state_wise.csv").download_to_filename("/tmp/percentage_second_dose_state_wise.csv")
+    bucket.blob("pipeline/rpt/percentage_overall_state_wise.csv").download_to_filename("/tmp/percentage_state_wise.csv")
     bucket.blob("pipeline/rpt/today.txt").download_to_filename("/tmp/today.txt")
 
     with open("/tmp/today.txt") as f:
@@ -121,11 +122,21 @@ def tweet_vax_ranking(_):
     today = pd.to_datetime(today)
     print("Top 10 districts by absolute numbers")
     districtWise = pd.read_csv("/tmp/districts_sorted_absolute.csv", index_col="district_state")
+    firstDosePercentage = pd.read_csv("/tmp/percentage_first_dose_state_wise.csv", names=["state", "percentage"]).set_index("state")
+    secondDosePercentage = pd.read_csv("/tmp/percentage_second_dose_state_wise.csv", names=["state", "percentage"]).set_index("state")
+    overallPercentage = pd.read_csv("/tmp/percentage_overall_state_wise.csv", names=["state", "percentage"]).set_index("state")
 
     twitter = get_twitter_client(env="staging")
     twitter.update_status(
             status="{} Top 10 districts-1st+2nd dose\n{}".format(str(today.date()), pretty_print_dataframe(districtWise[:10]))
             )
+    twitter.update_status(
+            status="{} Top 5 states-% of 1st dose vaxxed 18+ pop".format(str(today.date()), pretty_print_dataframe(firstDosePercentage[:5]))
+            )
+    twitter.update_status(
+            status="{} Top 5 states-% of 1st dose vaxxed 18+ pop".format(str(today.date()), pretty_print_dataframe(secondDosePercentage[:5]))
+            )
+
 
     return "OK!"
 

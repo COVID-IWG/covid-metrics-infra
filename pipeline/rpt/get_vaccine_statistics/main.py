@@ -131,13 +131,17 @@ def generate_vax_report(_):
     stateWisePop = vaccine_eligible_pop.set_index("State")
     percentageFirstDose = (stateWiseVax["first_dose_admin"])/stateWisePop["20+ total"] * 100.0
     percentageSecondDose = (stateWiseVax["second_dose_admin"]/stateWisePop["20+ total"]) * 100.0
+    percentageOverall = (stateWiseVax["first_dose_admin"] + stateWiseVax["second_dose_admin"])/stateWisePop["20+ total"] * 100.0
 
     percentageFirstDose.sort_values(ascending=False).to_csv("/tmp/percentage_first_dose_state_wise.csv")
     percentageSecondDose.sort_values(ascending=False).to_csv("/tmp/percentage_second_dose_state_wise.csv")
+    percentageOverall.sort_values(ascending=False).to_csv("/tmp/percentage_overall.csv")
+
     with open("/tmp/today.txt", "w") as f:
         f.write(str(today))
     transfer_csv_to_bucket("/tmp/today.txt")
     transfer_csv_to_bucket("/tmp/percentage_first_dose_state_wise.csv")
     transfer_csv_to_bucket("/tmp/percentage_second_dose_state_wise.csv")
+    transfer_csv_to_bucket("/tmp/percentage_overall_state_wise.csv")
 
     return "OK!"
