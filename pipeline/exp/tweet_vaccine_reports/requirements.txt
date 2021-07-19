@@ -1,0 +1,6 @@
+google-cloud-secret-manager
+google-cloud-storage
+tweepy
+pandas
+numpy
+matplotlib
