@@ -13,7 +13,7 @@ CI        = 0.95
 lookback  = 120 # how many days back to start estimation
 cutoff    = 2   # most recent data to use 
 dissolved_states = ["Delhi", "Chandigarh", "Manipur", "Sikkim", "Dadra And Nagar Haveli And Daman And Diu", "Andaman And Nicobar Islands", "Telangana", "Goa", "Assam", "Lakshadweep"]
-excluded = ["Unknown", "Other State", "Other Region" "Airport Quarantine", "Railway Quarantine", "BSF Camp", "Foreign Evacuees", "Italians", "Evacuees"]
+excluded = ["Unknown", "Other State", "Other Region", "Airport Quarantine", "Railway Quarantine", "BSF Camp", "Foreign Evacuees", "Italians", "Evacuees"]
 
 # cloud details 
 bucket_name = "daily_pipeline"
